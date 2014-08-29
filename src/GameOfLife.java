@@ -7,12 +7,11 @@ import javax.swing.Timer;
 public class GameOfLife implements Runnable, ActionListener {
 	
 	private final Mouse mouse = new Mouse();
-	private final Keyboard key = new Keyboard();
-	private Grid grid = new Grid();
+	private final Grid grid = new Grid();
 	private Grid next;
-	private PanelBar panel;
-	private View view;
-	private Timer timer = new Timer(100, this);
+	private final PanelBar panel;
+	private final View view;
+	private final Timer timer = new Timer(100, this);
 	private boolean go = false;
 	
 	public static void main(String[] args){
@@ -21,7 +20,7 @@ public class GameOfLife implements Runnable, ActionListener {
 	
 	private GameOfLife(){
 		panel = new PanelBar(this);
-		view = new View(800, 800, panel, grid, mouse, key);
+		view = new View(800, 800, panel, grid, mouse);
 		timer.setInitialDelay(50);
 		new Thread(this).start();
 	}
@@ -33,15 +32,16 @@ public class GameOfLife implements Runnable, ActionListener {
 					Point point = mouse.queue.remove();
 					point.x = point.x/grid.width;
 					point.y = point.y/grid.height;
-					grid.set(point.x+key.x, point.y+key.y,!grid.get(point.x,point.y));
-					view.update(grid);
+					grid.set(point.x+view.getX(), point.y+view.getY(),!grid.get(point.x,point.y));
+					view.repaint();
 				}
 			}
 		}
 	}
 	
 	private Grid next(){
-		Grid temp = new Grid(grid);
+		Grid temp = new Grid();
+		temp.CopyGrid(grid);
 		for (Point p: grid.actionZone()){
 			boolean b= grid.get(p.x, p.y);
 			int count = grid.count(p.x,p.y);
@@ -74,7 +74,7 @@ public class GameOfLife implements Runnable, ActionListener {
 			if (cmd.equals("Random")){
 				grid.randomGrid(40, 40);
 			}
-			view.update(grid);
+			view.repaint();
 		}
 		else{
 			if (grid.equals(next)){
@@ -82,9 +82,9 @@ public class GameOfLife implements Runnable, ActionListener {
 				go = false;
 			}
 			else{
-				grid = next;
-				view.update(grid);
-				next = next();
+				grid.CopyGrid(next);
+				view.repaint();
+				next.CopyGrid(next());
 			}	
 		}	
 	}

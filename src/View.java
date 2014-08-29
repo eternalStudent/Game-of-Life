@@ -7,24 +7,28 @@ public class View extends JFrame{
 	
 	private Canvas canvas;
 	
-	public View(int width, int height, PanelBar panel, Grid grid, Mouse mouse, Keyboard key){
+	public View(int width, int height, PanelBar panel, Grid grid, Mouse mouse){
 		super();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	
 		setResizable(false);
-		addKeyListener(key);
 		setLayout(new BorderLayout());
 		add(panel, BorderLayout.SOUTH);
-		canvas = new Canvas(width, height, grid, mouse, key);
+		canvas = new Canvas(width, height, grid, mouse);
 		add(canvas, BorderLayout.NORTH);
 		pack();
 		setVisible(true);
-		requestFocusInWindow();
 	}
 	
-	public void update(Grid grid){
-		canvas.grid = grid;
-		requestFocusInWindow();
-		repaint();
+	public int getX(){
+		if (canvas == null)
+			return 0;
+		return canvas.x0;
+	}
+	
+	public int getY(){
+		if (canvas == null)
+			return 0;
+		return canvas.y0;
 	}
 
 }

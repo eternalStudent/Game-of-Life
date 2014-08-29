@@ -13,7 +13,8 @@ public class Grid {
 	public Grid(){		
 	}
 	
-	public Grid(Grid other){
+	public void CopyGrid(Grid other){
+		clear();
 		points.addAll(other.points);
 	}
 	
