@@ -1,92 +1,89 @@
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 public class GameOfLife implements Runnable, ActionListener {
 	
 	private final Mouse mouse = new Mouse();
 	private final Grid grid = new Grid();
-	private Grid next;
-	private final PanelBar panel;
+	private final MenuBar menuBar;
 	private final View view;
 	private final Timer timer = new Timer(100, this);
-	private boolean go = false;
 	
 	public static void main(String[] args){
 		new GameOfLife();
 	}
 	
 	private GameOfLife(){
-		panel = new PanelBar(this);
-		view = new View(800, 800, panel, grid, mouse);
+		menuBar = new MenuBar(this);
+		view = new View(840, 840, menuBar, grid, mouse);
 		timer.setInitialDelay(50);
 		new Thread(this).start();
 	}
 	
 	public void run(){
 		while (true){
-			while(!go){
+			while(!timer.isRunning()){
 				if (!mouse.queue.isEmpty()){
 					Point point = mouse.queue.remove();
-					point.x = point.x/grid.width;
-					point.y = point.y/grid.height;
-					grid.set(point.x+view.getX(), point.y+view.getY(),!grid.get(point.x,point.y));
+					grid.negation(point.x/grid.size+view.getX(), point.y/grid.size+view.getY());
 					view.repaint();
 				}
 			}
 		}
 	}
-	
-	private Grid next(){
-		Grid temp = new Grid();
-		temp.CopyGrid(grid);
-		for (Point p: grid.actionZone()){
-			boolean b= grid.get(p.x, p.y);
-			int count = grid.count(p.x,p.y);
-			if (b && (count<2 || count> 3))
-				temp.set(p.x, p.y, false);
-			if (!b && count==3)
-				temp.set(p.x, p.y, true);	
-		}
-		return temp;
-	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		String cmd = e.getActionCommand();
-		if (cmd == null)
-			cmd = "";
-		if (cmd.equals("Go!")){
-			go = !go;
-			if (!go)
+	public void actionPerformed(ActionEvent ae) {
+		String cmd = ae.getActionCommand();
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(new LifeFilter());
+		chooser.setAcceptAllFileFilterUsed(false);
+		if (cmd == null){
+			Grid next = grid.next();
+			if (grid.equals(next))
 				timer.stop();
-			else{
-				next = next();
-				timer.start();
-			}
+			else
+				grid.copy(next);
 		}	
-		if (!go){
+		else{
+			if (cmd.equals("Go") && !timer.isRunning())
+				timer.start();
+			if (cmd.equals("Stop") && timer.isRunning())
+				timer.stop();
+			if (cmd.equals("Step") && !timer.isRunning())
+				grid.copy(grid.next());
+			if (cmd.equals("Set Delay")){
+				String str = (String) JOptionPane.showInputDialog(menuBar, "Set the delay in milliseconds:", "Set Delay", JOptionPane.PLAIN_MESSAGE, null, null, Integer.toString(timer.getDelay()));
+				try{timer.setDelay(Integer.parseInt(str));}
+				catch(Exception e){}				
+			}	
 			if (cmd.equals("Clear")){
+				timer.stop();
 				grid.clear();
 			}
-			if (cmd.equals("Random")){
-				grid.randomGrid(40, 40);
+			if (cmd.equals("Save")){
+				if (chooser.showSaveDialog(view.getContentPane()) == JFileChooser.APPROVE_OPTION) {
+	                File file = chooser.getSelectedFile();
+	                try{grid.writeFile(file);}
+	                catch(Exception e){}
+				}    
 			}
-			view.repaint();
+			if (cmd.equals("Open")){
+				if (chooser.showSaveDialog(view.getContentPane()) == JFileChooser.APPROVE_OPTION) {
+	                File file = chooser.getSelectedFile();
+	                try{grid.readFile(file);}
+	                catch(Exception e){}
+				}    
+			}
+			if (cmd.matches("\\d{1,2}"))
+				grid.size=Integer.parseInt(cmd);	
 		}
-		else{
-			if (grid.equals(next)){
-				panel.go();
-				go = false;
-			}
-			else{
-				grid.CopyGrid(next);
-				view.repaint();
-				next.CopyGrid(next());
-			}	
-		}	
+		view.repaint();
 	}
 
 }

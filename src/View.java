@@ -1,5 +1,3 @@
-import java.awt.BorderLayout;
-
 import javax.swing.JFrame;
 
 @SuppressWarnings("serial")
@@ -7,16 +5,14 @@ public class View extends JFrame{
 	
 	private Canvas canvas;
 	
-	public View(int width, int height, PanelBar panel, Grid grid, Mouse mouse){
+	public View(int width, int height, MenuBar menuBar, Grid grid, Mouse mouse){
 		super();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	
 		setResizable(false);
-		setLayout(new BorderLayout());
-		add(panel, BorderLayout.SOUTH);
-		canvas = new Canvas(width, height, grid, mouse);
-		add(canvas, BorderLayout.NORTH);
-		pack();
+		setJMenuBar(menuBar);
+		setContentPane(canvas = new Canvas(width, height, grid, mouse));
 		setVisible(true);
+		pack();
 	}
 	
 	public int getX(){

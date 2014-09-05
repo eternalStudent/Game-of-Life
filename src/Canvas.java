@@ -10,9 +10,7 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class Canvas extends JPanel implements KeyListener{
 	
-	public Grid grid;
-	public final int width=20;
-	public final int height=20;
+	private final Grid grid;
 	private BufferedImage black, white;
 	public int x0 = 0;
 	public int y0 = 0;
@@ -24,8 +22,6 @@ public class Canvas extends JPanel implements KeyListener{
 		addKeyListener(this);
 		setPreferredSize(new Dimension(width, height));
 		setBackground(Color.WHITE);
-		black = renderImage(true);
-		white = renderImage(false);
 	}
 	
 	private BufferedImage renderImage(boolean b){
@@ -34,10 +30,10 @@ public class Canvas extends JPanel implements KeyListener{
 			rgb = Color.BLACK.getRGB();
 		else
 			rgb = Color.WHITE.getRGB();
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		for (int x=0; x<width; x++)
-			for (int y=0; y<height; y++)
-				if (y*x==0 || y==height-1 || x==width-1)
+		BufferedImage image = new BufferedImage(grid.size, grid.size, BufferedImage.TYPE_INT_ARGB);
+		for (int x=0; x<grid.size; x++)
+			for (int y=0; y<grid.size; y++)
+				if (y*x==0 || y==grid.size-1 || x==grid.size-1)
 					image.setRGB(x, y, Color.GRAY.getRGB());
 				else 
 					image.setRGB(x, y, rgb);
@@ -53,10 +49,12 @@ public class Canvas extends JPanel implements KeyListener{
 	public void paint(Graphics g){
 		requestFocusInWindow();
 		super.paint(g);
+		black = renderImage(true);
+		white = renderImage(false);
 		Dimension dim = getPreferredSize();
-		for (int x=0; x<dim.width/width; x++)
-			for (int y=0; y<dim.height/height; y++)
-				g.drawImage(getImage(grid.get(x+x0, y+y0)), x*width, y*height, width, height, null);
+		for (int x=0; x<dim.width/grid.size; x++)
+			for (int y=0; y<dim.height/grid.size; y++)
+				g.drawImage(getImage(grid.get(x+x0, y+y0)), x*grid.size, y*grid.size, null);
 	}
 
 	@Override
@@ -70,21 +68,13 @@ public class Canvas extends JPanel implements KeyListener{
 			y0--; break;
 		case KeyEvent.VK_DOWN:
 			y0++;
-		}
-		
+		}		
 		repaint();
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	public void keyReleased(KeyEvent e) {}
 	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void keyTyped(KeyEvent e) {}
 
 }
