@@ -1,3 +1,4 @@
+package view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
@@ -6,6 +7,9 @@ import java.awt.image.BufferedImage;
 import java.awt.Graphics;
 
 import javax.swing.JPanel;
+
+import controller.Mouse;
+import model.Grid;
 
 @SuppressWarnings("serial")
 public class Canvas extends JPanel implements KeyListener{

@@ -2,16 +2,24 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
+import javax.swing.UIManager;
+
+import controller.Mouse;
+import model.Grid;
+import util.LifeFilter;
+import view.Board;
+import view.MenuBar;
 
 public class GameOfLife implements Runnable, ActionListener {
 	
 	private final Mouse mouse = new Mouse();
 	private final Grid grid = new Grid();
 	private final MenuBar menuBar;
-	private final View view;
+	private final Board board;
 	private final Timer timer = new Timer(100, this);
 	
 	public static void main(String[] args){
@@ -19,8 +27,10 @@ public class GameOfLife implements Runnable, ActionListener {
 	}
 	
 	private GameOfLife(){
+		try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } 
+		catch (Exception e) { e.printStackTrace(); }
 		menuBar = new MenuBar(this);
-		view = new View(840, 840, menuBar, grid, mouse);
+		board = new Board(840, 840, menuBar, grid, mouse);
 		timer.setInitialDelay(50);
 		new Thread(this).start();
 	}
@@ -30,8 +40,8 @@ public class GameOfLife implements Runnable, ActionListener {
 			while(!timer.isRunning()){
 				if (!mouse.queue.isEmpty()){
 					Point point = mouse.queue.remove();
-					grid.negation(point.x/grid.size+view.getX(), point.y/grid.size+view.getY());
-					view.repaint();
+					grid.negation(point.x/grid.size+board.getX(), point.y/grid.size+board.getY());
+					board.repaint();
 				}
 			}
 		}
@@ -67,23 +77,27 @@ public class GameOfLife implements Runnable, ActionListener {
 				grid.clear();
 			}
 			if (cmd.equals("Save")){
-				if (chooser.showSaveDialog(view.getContentPane()) == JFileChooser.APPROVE_OPTION) {
+				if (chooser.showSaveDialog(board.getContentPane()) == JFileChooser.APPROVE_OPTION) {
 	                File file = chooser.getSelectedFile();
-	                try{grid.writeFile(file);}
-	                catch(Exception e){}
+	                try{
+	                	grid.writeFile(file);
+	                	board.setTitle(file.getName());
+	                }catch(Exception e){}
 				}    
 			}
 			if (cmd.equals("Open")){
-				if (chooser.showSaveDialog(view.getContentPane()) == JFileChooser.APPROVE_OPTION) {
+				if (chooser.showSaveDialog(board.getContentPane()) == JFileChooser.APPROVE_OPTION) {
 	                File file = chooser.getSelectedFile();
-	                try{grid.readFile(file);}
-	                catch(Exception e){}
+	                try{
+	                	grid.readFile(file);
+	                	board.setTitle(file.getName());
+	                }catch(Exception e){}
 				}    
 			}
 			if (cmd.matches("\\d{1,2}"))
 				grid.size=Integer.parseInt(cmd);	
 		}
-		view.repaint();
+		board.repaint();
 	}
 
 }
