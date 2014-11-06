@@ -40,7 +40,7 @@ public class GameOfLife implements Runnable, ActionListener {
 			while(!timer.isRunning()){
 				if (!mouse.queue.isEmpty()){
 					Point point = mouse.queue.remove();
-					grid.negation(point.x/grid.size+board.getX(), point.y/grid.size+board.getY());
+					grid.negation(point.x/grid.size+grid.x0, point.y/grid.size+grid.y0);
 					board.repaint();
 				}
 			}

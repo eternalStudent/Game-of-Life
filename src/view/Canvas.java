@@ -16,8 +16,6 @@ public class Canvas extends JPanel implements KeyListener{
 	
 	private final Grid grid;
 	private BufferedImage black, white;
-	public int x0 = 0;
-	public int y0 = 0;
 	
 	public Canvas(int width, int height, Grid grid, Mouse mouse){
 		super();
@@ -58,20 +56,24 @@ public class Canvas extends JPanel implements KeyListener{
 		Dimension dim = getPreferredSize();
 		for (int x=0; x<dim.width/grid.size; x++)
 			for (int y=0; y<dim.height/grid.size; y++)
-				g.drawImage(getImage(grid.get(x+x0, y+y0)), x*grid.size, y*grid.size, null);
+				g.drawImage(getImage(grid.get(x+grid.x0, y+grid.y0)), x*grid.size, y*grid.size, null);
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()){
 		case KeyEvent.VK_LEFT:
-			x0--; break;
+			grid.x0--;
+			break;
 		case KeyEvent.VK_RIGHT:
-			x0++; break;
+			grid.x0++;
+			break;
 		case KeyEvent.VK_UP:
-			y0--; break;
+			grid.y0--;
+			break;
 		case KeyEvent.VK_DOWN:
-			y0++;
+			grid.y0++;
+			break;
 		}		
 		repaint();
 	}

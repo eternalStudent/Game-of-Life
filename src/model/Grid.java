@@ -17,6 +17,8 @@ public class Grid {
 	private final Set<Point> points = new HashSet<>();
 	private final Random random = new Random();
 	public int size=20;
+	public int x0 = 0;
+	public int y0 = 0;
 	
 	public void copy(Grid other){
 		clear();
@@ -96,7 +98,7 @@ public class Grid {
 	public String toString(){
 		StringBuilder sb = new StringBuilder("{");
 		for (Point p: points)
-			sb.append(" ("+p.x+", "+p.y+")");
+			sb.append(" ("+(p.x-x0)+", "+(p.y-y0)+")");
 		sb.append(" }");
 		return sb.toString();
 	}
@@ -123,6 +125,8 @@ public class Grid {
 		Matcher m = p.matcher(s);
 		int i=0;
 		clear();
+		x0 = 0;
+		y0 = 0;
 		while (m.find(i)){
 			Object[] values;
 			values = new MessageFormat(pattern).parse(m.group());
